@@ -1,0 +1,17 @@
+module Top_Module(sw_a , sw_b , sw_op , HEXR , HEXA , HEXB);
+input [1:0] sw_a , sw_b;
+input [2:0] sw_op;
+output [6:0] HEXR , HEXA , HEXB ;
+
+wire [3:0] w_alu_result;
+
+ALU alu_instance(.A(sw_a) , .B(sw_b) , .op(sw_op) , .alu_result(w_alu_result));
+
+
+sev_seg_decoder(.num_in(w_alu_result) , .seg(HEXR));
+sev_seg_decoder(.num_in({2'b00 , sw_a}) , .seg(HEXA));
+sev_seg_decoder(.num_in({2'b00 , sw_b}) , .seg(HEXB));
+
+
+
+endmodule

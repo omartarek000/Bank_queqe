@@ -1,0 +1,82 @@
+m255
+K4
+z2
+!s11f vlog 2020.1 2020.02, Feb 28 2020
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+d/home/omar-tarek/Desktop/ComputerArch/labs
+vALU
+Z0 !s110 1765050552
+!i10b 1
+!s100 1h55ic9NH:QjhTiX5ihYj2
+Z1 !s11b Dg1SIo80bB@j0V0VzS_@n1
+IPGD9ZdD2[BNO?f<BOW7[d3
+Z2 VDg1SIo80bB@j0V0VzS_@n1
+Z3 d/home/omar-tarek/Desktop/ComputerArch/labs/lab5
+w1765050335
+8/home/omar-tarek/Desktop/ComputerArch/labs/lab5/ALU.v
+F/home/omar-tarek/Desktop/ComputerArch/labs/lab5/ALU.v
+!i122 12
+L0 1 40
+Z4 OV;L;2020.1;71
+r1
+!s85 0
+31
+!s108 1765050551.000000
+!s107 /home/omar-tarek/Desktop/ComputerArch/labs/lab5/ALU.v|
+!s90 -reportprogress|300|-work|work|-stats=none|/home/omar-tarek/Desktop/ComputerArch/labs/lab5/ALU.v|
+!i113 1
+Z5 o-work work
+Z6 tCvgOpt 0
+n@a@l@u
+vsev_seg_decoder
+R0
+!i10b 1
+!s100 V8F`[T^2K7PBQME_JP[l[1
+R1
+INgE=8k`9_`3ioAdQ4a8h[2
+R2
+R3
+w1765047929
+8/home/omar-tarek/Desktop/ComputerArch/labs/lab5/sev_seg_decoder.v
+F/home/omar-tarek/Desktop/ComputerArch/labs/lab5/sev_seg_decoder.v
+!i122 13
+L0 1 21
+R4
+r1
+!s85 0
+31
+Z7 !s108 1765050552.000000
+!s107 /home/omar-tarek/Desktop/ComputerArch/labs/lab5/sev_seg_decoder.v|
+!s90 -reportprogress|300|-work|work|-stats=none|/home/omar-tarek/Desktop/ComputerArch/labs/lab5/sev_seg_decoder.v|
+!i113 1
+R5
+R6
+vTop_Module
+R0
+!i10b 1
+!s100 oh7oV9zOmdY9T>9X:IX8k2
+R1
+IcTMWn4GXN^dWMiNTH04:h3
+R2
+R3
+w1765050546
+8/home/omar-tarek/Desktop/ComputerArch/labs/lab5/top_module.v
+F/home/omar-tarek/Desktop/ComputerArch/labs/lab5/top_module.v
+!i122 14
+L0 1 17
+R4
+r1
+!s85 0
+31
+R7
+!s107 /home/omar-tarek/Desktop/ComputerArch/labs/lab5/top_module.v|
+!s90 -reportprogress|300|-work|work|-stats=none|/home/omar-tarek/Desktop/ComputerArch/labs/lab5/top_module.v|
+!i113 1
+R5
+R6
+n@top_@module

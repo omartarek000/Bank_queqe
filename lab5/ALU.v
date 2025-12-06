@@ -1,0 +1,40 @@
+module ALU(A,B,alu_result,op);
+input [1:0] A,B;
+input [2:0] op;
+output [3:0] alu_result;
+
+reg [3:0] alu_result;
+
+
+always @(*)
+begin
+
+    case(op)
+    3'b000: 
+        alu_result = A && B ; 
+
+    3'b001:
+        alu_result = A || B;
+    
+    3'b010:
+        alu_result = A + B;
+    
+    3'b011:
+        alu_result = A - B;
+
+    3'b100:
+        alu_result = A * B;
+
+    3'b101:
+        alu_result = A > B? 4'b0001 : 4'b0000;
+    3'b110:
+        alu_result = A < B ? 4'b0000 : 4'b0001;
+
+    3'b111:
+        alu_result = 4'b0;
+
+    default : alu_result = 4'b0;
+    endcase 
+end
+
+endmodule
