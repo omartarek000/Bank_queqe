@@ -6,15 +6,42 @@ module display #(
 )(
     input  wire [n:0] Pcount,
     input  wire [WTIME_WIDTH:0] Pwait,
-    output reg [3:0] pcount_seg, 
-    output reg [3:0] TSeg1,  
-    output reg [3:0] TSeg2   
+    output reg [3:0] Pseg1,
+	 output reg [3:0] Pseg2,
+    output reg [3:0] TSeg1,  // tens digit of Pwait
+    output reg [3:0] TSeg2   // units digit of Pwait
 );
 
+    // Extract tens and units digits of Pcount
     always @(*) begin
-        pcount_seg = Pcount;
+	 
+		//pcount_seg = Pcount;
+		  if (Pcount >= 60) begin
+            Pseg1 = 6;
+            Pseg2 = Pcount - 60;
+        end else if (Pcount >= 50) begin
+            Pseg1 = 5;
+            Pseg2 = Pcount - 50;
+        end else if (Pcount >= 40) begin
+            Pseg1 = 4;
+            Pseg2 = Pcount - 40;
+        end else if (Pcount >= 30) begin
+            Pseg1 = 3;
+            Pseg2 = Pcount - 30;
+        end else if (Pcount >= 20) begin
+            Pseg1 = 2;
+            Pseg2 = Pcount - 20;
+        end else if (Pcount >= 10) begin
+            Pseg1 = 1;
+            Pseg2 = Pcount - 10;
+        end else begin
+            Pseg1 = 0;
+            Pseg2 = Pcount;
+        end
+
     end
 
+    // Extract tens and units digits of Pwait
     always @(*) begin
         if (Pwait >= 60) begin
             TSeg1 = 6;
@@ -38,6 +65,8 @@ module display #(
             TSeg1 = 0;
             TSeg2 = Pwait;
         end
+		  
+		  
     end
 
 endmodule

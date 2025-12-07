@@ -26,7 +26,12 @@ module queue #(
     wire two_fall = (!phcTwo_safe && phcTwo_prev);
 
     wire [n+3:0] base_wait;
-    assign base_wait = (Pcount + Tcount > 0) ? (Pcount + Tcount - 1) : 0;
+    //assign base_wait = (Pcount + Tcount > 0) ? (Pcount + Tcount - 1) : 0;
+	 assign base_wait = (Tcount == 0) ? 0 : 
+                   ((Pcount + Tcount > 0) ? (Pcount + Tcount - 1) : 0);
+	// if(Tcount ==0 ) assign base_wait =0;
+	// else if(Pcount + Tcount > 0) assign base_wait = (Pcount + Tcount - 1);
+	// else assign base_wait = 0;
 
     always @(posedge clock or negedge reset) begin
         if (!reset) begin
