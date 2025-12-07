@@ -142,33 +142,10 @@ Computes expected waiting time using simple arithmetic.
 
 ---
 
-## Example Instantiation
-
-```verilog
-queue #(
-    .n(3)
-) queue_inst (
-    .reset(reset),
-    .phcOne(phcOne),
-    .phcTwo(phcTwo),
-    .Tcount(Tcount),
-    .clock(clock),
-    .Pcount(Pcount),
-    .Pwait(Pwait),
-    .emptyFlag(emptyFlag),
-    .fullFlag(fullFlag)
-);
-```
-
----
-
-## Authors
-
-- Khaled
-- Omar
-- Mahmoud
-
 ## RTL simulation of the full circuit 
 <img width="802" height="440" alt="image" src="https://github.com/user-attachments/assets/cfb0569d-723b-4fab-8d75-00ed0b065725" />
+
+
+
 
 ---
