@@ -1,4 +1,4 @@
-module queue (
+module queue #(                 
     parameter n = 3,
     parameter P_COUNT_MAX = (1 << (n+1)) - 1, 
     parameter P_WAIT_MAX  = 3 * P_COUNT_MAX,  
