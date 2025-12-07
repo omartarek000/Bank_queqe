@@ -6,31 +6,10 @@
 module sevenBehavioral (
     input  [3:0] digit,   // BCD input: 0 to 9 (4-bit)
     output reg [6:0] seg  // 7-seg output: {a, b, c, d, e, f, g}
-                          // Segment mapping: 
-                          //       a
-                          //     ?????
-                          //   f ?   ? b
-                          //     ? g ?
-                          //     ?????
-                          //   e ?   ? c
-                          //     ?   ?
-                          //     ?????
-                          //       d
+
 );
 
-    // Common cathode: '1' = LED ON, '0' = OFF
-    // Truth table for digits 0-9:
-    // digit | a b c d e f g | seg[6:0] = {a,b,c,d,e,f,g}
-    //   0   | 1 1 1 1 1 1 0 ? 7'b1111110
-    //   1   | 0 1 1 0 0 0 0 ? 7'b0110000
-    //   2   | 1 1 0 1 1 0 1 ? 7'b1101101
-    //   3   | 1 1 1 1 0 0 1 ? 7'b1111001
-    //   4   | 0 1 1 0 0 1 1 ? 7'b0110011
-    //   5   | 1 0 1 1 0 1 1 ? 7'b1011011
-    //   6   | 1 0 1 1 1 1 1 ? 7'b1011111
-    //   7   | 1 1 1 0 0 0 0 ? 7'b1110000
-    //   8   | 1 1 1 1 1 1 1 ? 7'b1111111
-    //   9   | 1 1 1 1 0 1 1 ? 7'b1111011
+
 
     always @(*) begin
         case (digit)
