@@ -1,135 +1,89 @@
-// Queue NOT Top module, The top module will be the combination of the three modules
-// input: two photocells - active low
-//        2 bits -> number of tellers
-//        clk and reset
-// Output: Pcount
-
-module queue #(
+module queue (
     parameter n = 3,
-    parameter idle = 2'b00,    // states
-    parameter coming = 2'b01,
-    parameter leaving = 2'b10,
-
-    parameter P_COUNT_MAX = (1 << (n+1)) - 1,
-    parameter P_WAIT_MAX  = 3 * P_COUNT_MAX,
-    parameter WTIME_WIDTH = $clog2(P_WAIT_MAX + 1)
+    parameter P_COUNT_MAX = (1 << (n+1)) - 1, 
+    parameter P_WAIT_MAX  = 3 * P_COUNT_MAX,  
+    parameter WTIME_WIDTH = $clog2(P_WAIT_MAX + 1) 
 )(
-    input reset,
-    input phcOne, phcTwo,      // phc -> abbreviation for photocell
-    input [1:0] Tcount,        // Number of tellers, MAX = 3 tellers
-    input clock,
-    output reg [n:0] Pcount,   // Number of people, MAX = 15 (for n=3)
-    output reg [WTIME_WIDTH:0] Pwait, // expected time to be waited until served
-    output reg emptyFlag, fullFlag 
+    input wire reset,             
+    input wire phcOne, phcTwo,    
+    input wire [1:0] Tcount,      
+    input wire clock,             
+    output reg [n:0] Pcount,
+    output reg [WTIME_WIDTH:0] Pwait,
+    output reg emptyFlag, fullFlag    
 );
 
-  /*  // Derived parameters
-    localparam P_COUNT_MAX = (1 << (n+1)) - 1;
-    localparam P_WAIT_MAX  = 3 * P_COUNT_MAX;
-    localparam WTIME_WIDTH = $clog2(P_WAIT_MAX + 1) - 1;
-    */
+    localparam IDLE    = 2'b00;
+    localparam COMING  = 2'b01;
+    localparam LEAVING = 2'b10;
     
-    // FSM state register
-    reg [1:0] state, next_state;
-    
-    // Synchronizers for async inputs (prevents metastability)
-    reg phcOne_sync1, phcOne_sync2;
-    reg phcTwo_sync1, phcTwo_sync2;
-    
-    // Edge detection
-    reg phcOne_prev, phcTwo_prev;
-    wire phcOne_negedge = phcOne_prev && !phcOne_sync2;
-    wire phcTwo_negedge = phcTwo_prev && !phcTwo_sync2;
-    
-    // Intermediate calculation variable
-    reg [n+3:0] numerator;     // Sized for 3*(Pcount+Tcount-1)
-    
-    // Synchronize async inputs
+    reg [1:0] state;
+
+    reg phcOne_safe, phcOne_prev;
+    reg phcTwo_safe, phcTwo_prev;
+
+    wire one_fall = (!phcOne_safe && phcOne_prev);
+    wire two_fall = (!phcTwo_safe && phcTwo_prev);
+
+    wire [n+3:0] base_wait;
+    assign base_wait = (Pcount + Tcount > 0) ? (Pcount + Tcount - 1) : 0;
+
     always @(posedge clock or negedge reset) begin
         if (!reset) begin
-            phcOne_sync1 <= 1'b1;
-            phcOne_sync2 <= 1'b1;
-            phcTwo_sync1 <= 1'b1;
-            phcTwo_sync2 <= 1'b1;
+            state       <= IDLE;
+            Pcount      <= 0;
+            fullFlag    <= 0;
+            emptyFlag   <= 1;
+            
+            phcOne_safe <= 1'b1; 
             phcOne_prev <= 1'b1;
+            phcTwo_safe <= 1'b1; 
             phcTwo_prev <= 1'b1;
+            
+            Pwait       <= 0;
         end else begin
-            phcOne_sync1 <= phcOne;
-            phcOne_sync2 <= phcOne_sync1;
-            phcTwo_sync1 <= phcTwo;
-            phcTwo_sync2 <= phcTwo_sync1;
-            phcOne_prev <= phcOne_sync2;
-            phcTwo_prev <= phcTwo_sync2;
-        end
-    end
-    
-    // FSM: Next state logic
-    always @(*) begin
-        if (phcOne_negedge)
-            next_state = coming;
-        else if (phcTwo_negedge)
-            next_state = leaving;
-        else
-            next_state = idle;
-    end
-    
-    // FSM: State register
-    always @(posedge clock or negedge reset) begin
-        if (!reset)
-            state <= idle;
-        else
-            state <= next_state;
-    end
-    
-    // FSM: Output logic and counter control
-    always @(posedge clock or negedge reset) begin
-        if (!reset) begin
-            Pcount <= 0;
-            fullFlag <= 0;
-            emptyFlag <= 1;
-        end else begin
-            case(state) 
-                idle: begin
-                    fullFlag <= (Pcount == P_COUNT_MAX);
-                    emptyFlag <= (Pcount == 0);
-                end
-                
-                coming: begin
-                    if (Pcount < P_COUNT_MAX) begin
-                        Pcount <= Pcount + 1;
-                        emptyFlag <= 0;
-                        fullFlag <= (Pcount + 1 == P_COUNT_MAX);
+            phcOne_safe <= phcOne; 
+            phcTwo_safe <= phcTwo;
+            
+            phcOne_prev <= phcOne_safe;
+            phcTwo_prev <= phcTwo_safe;
+
+            fullFlag  <= (Pcount == P_COUNT_MAX);
+            emptyFlag <= (Pcount == 0);
+
+            case (state)
+                IDLE: begin
+                    if (one_fall && (Pcount < P_COUNT_MAX)) begin
+                        state <= COMING;
+                    end 
+                    else if (two_fall && (Pcount > 0)) begin
+                        state <= LEAVING;
                     end
                 end
-                
-                leaving: begin
-                    if (Pcount > 0) begin
-                        Pcount <= Pcount - 1;
-                        fullFlag <= 0;
-                        emptyFlag <= (Pcount - 1 == 0);
-                    end
+
+                COMING: begin
+                    Pcount <= Pcount + 1;
+                    state  <= IDLE;
+                end
+
+                LEAVING: begin
+                    Pcount <= Pcount - 1;
+                    state  <= IDLE; 
                 end
                 
-                default: begin
-                    fullFlag <= (Pcount == P_COUNT_MAX);
-                    emptyFlag <= (Pcount == 0);
-                end
+                default: state <= IDLE;
             endcase
-        end
-    end
-    
-    // Wait time calculation
-    always @(posedge clock or negedge reset) begin
-        if (!reset || emptyFlag) begin
-            Pwait <= 0;
-        end else begin
-            numerator = 3 * (Pcount + Tcount - 1);
-            case(Tcount)
-                2'd1: Pwait <= numerator;
-                2'd2: Pwait <= numerator >> 1;
-                2'd3: Pwait <= (numerator * 2'd1) / 2'd3;  // More accurate division
-                default: Pwait <= numerator;
-            endcase
+
+            if (Pcount == 0) begin
+                Pwait <= 0;
+            end else begin
+                case(Tcount)
+                    2'd1: Pwait <= 3 * base_wait;
+                    2'd2: Pwait <= (3 * base_wait) >> 1; 
+                    2'd3: Pwait <= base_wait;            
+                    default: Pwait <= 3 * base_wait;
+                endcase
+            end
         end
     end
 
