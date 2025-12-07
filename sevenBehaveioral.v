@@ -1,6 +1,5 @@
 // sevenBehavioral.v
 // Converts 4-bit BCD digit (0-9) to 7-segment display pattern (common cathode)
-// Author:(Mahmoud)
 // Designed for DE10-Lite (common cathode 7-seg: HEX0-HEX5)
 
 module sevenBehavioral (
@@ -8,9 +7,6 @@ module sevenBehavioral (
     output reg [6:0] seg  // 7-seg output: {a, b, c, d, e, f, g}
 
 );
-
-
-
     always @(*) begin
         case (digit)
             4'd0: seg = 7'b1111110;  // 0
