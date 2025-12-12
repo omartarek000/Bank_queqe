@@ -1,0 +1,96 @@
+fibonacci:
+                                # int fibonacci(int n) { 
+    addiu   $sp, $sp, -32       # Allocate 32 bytes for stack frame
+    sw      $ra, 28($sp)        # Save Return Address ($ra)
+    sw      $fp, 24($sp)        # Save old Frame Pointer ($fp)
+    move    $fp, $sp            # Set new Frame Pointer to current Stack Pointer
+    sw      $4, 16($fp)         # Store argument 'n' ($a0/$4) to stack at offset 16
+    
+                                # if (n == 0) 
+    
+    lw      $1, 16($fp)         # Load 'n' from stack
+    bnez    $1, $BB0_3          # If n != 0, branch to check if n == 1
+    nop                         # Delay slot
+    j       $BB0_2              # Jump to return 0 block
+    nop                         # Delay slot
+    
+    
+                                # return 0;
+$BB0_2:                         # Label: Handle return 0 
+    sw      $zero, 20($fp)      # Store 0 into return value slot (offset 20)
+    j       $BB0_12             # Jump to function epilogue (exit)
+    nop                         # Delay slot
+
+                                # if (n == 1)
+$BB0_3:
+    lw      $1, 16($fp)         # Load 'n' from stack
+    addiu   $2, $zero, 1        # Load immediate 1 into $2
+    bne     $1, $2, $BB0_6      # If n != 1, branch to loop initialization
+    nop                         # Delay slot
+    j       $BB0_5              # Jump to return 1 block
+    nop                         # Delay slot
+
+                                # return 1;
+$BB0_5:
+    addiu   $1, $zero, 1        # Load immediate 1 into $1
+    sw      $1, 20($fp)         # Store 1 into return value slot (offset 20)
+    j       $BB0_12             # Jump to function epilogue (exit)
+    nop                         # Delay slot
+
+                                # Loop Initialization: int prev = 0, curr = 1, i = 2;
+$BB0_6:
+    sw      $zero, 12($fp)      # prev = 0 (stored at offset 12)
+    addiu   $1, $zero, 1        # Load 1
+    sw      $1, 8($fp)          # curr = 1 (stored at offset 8)
+    addiu   $1, $zero, 2        # Load 2
+    sw      $1, 0($fp)          # i = 2 (stored at offset 0)
+    j       $BB0_7              # Jump to loop condition check
+    nop                         # Delay slot
+
+                                # Loop Condition: for (...; i <= n; ...)
+$BB0_7:
+    lw      $2, 0($fp)          # Load 'i'
+    lw      $1, 16($fp)         # Load 'n'
+    slt     $1, $1, $2          # Set $1 = 1 if n < i (loop finish condition)
+    bnez    $1, $BB0_11         # If n < i, exit loop (jump to return result)
+    nop                         # Delay slot
+    j       $BB0_9              # Else, enter loop body
+    nop                         # Delay slot
+
+                                # Loop Body: { int temp = prev + curr; prev = curr; curr = temp; }
+$BB0_9:
+    lw      $1, 12($fp)         # Load 'prev'
+    lw      $2, 8($fp)          # Load 'curr'
+    addu    $1, $1, $2          # $1 = prev + curr
+    sw      $1, 4($fp)          # temp = $1 (store at offset 4)
+    lw      $1, 8($fp)          # Load 'curr'
+    sw      $1, 12($fp)         # prev = curr
+    lw      $1, 4($fp)          # Load 'temp'
+    sw      $1, 8($fp)          # curr = temp
+    j       $BB0_10             # Jump to increment step
+    nop                         # Delay slot
+
+                                # Loop Increment: i++
+$BB0_10:
+    lw      $1, 0($fp)          # Load 'i'
+    addiu   $1, $1, 1           # Increment 'i' by 1
+    sw      $1, 0($fp)          # Store updated 'i'
+    j       $BB0_7              # Jump back to loop condition
+    nop                         # Delay slot
+
+                                # Prepare return value (after loop)
+$BB0_11:
+    lw      $1, 8($fp)          # Load 'curr' (the final Fibonacci number)
+    sw      $1, 20($fp)         # Store result in return value slot
+    j       $BB0_12             # Jump to epilogue
+    nop                         # Delay slot
+
+                                # Function Epilogue
+$BB0_12:
+    lw      $2, 20($fp)         # Load final result from stack into $v0 ($2) for return
+    move    $sp, $fp            # Restore Stack Pointer
+    lw      $fp, 24($sp)        # Restore old Frame Pointer
+    lw      $ra, 28($sp)        # Restore Return Address
+    addiu   $sp, $sp, 32        # Deallocate stack frame
+    jr      $ra                 # Jump back to caller
+    nop                         # Delay slot
